@@ -280,6 +280,19 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
     <!-- PHASE CARDS -->
     <div id="faseCards" class="fase-scroll"></div>
 
+    <!-- CALENDAR -->
+    <div class="cal-section">
+      <div class="cal-header">
+        <span class="cal-title" id="calLabel">Week</span>
+        <div style="display:flex;gap:6px">
+          <button class="cal-nav" onclick="calNav(-1)">‹</button>
+          <button class="cal-nav" onclick="calNav(1)">›</button>
+        </div>
+      </div>
+      <div class="cal-row" id="calRow"></div>
+    </div>
+
+
     <!-- PROGRESS -->
     <div class="progress-card" onclick="goTab('plan')">
       <div class="progress-ring">
@@ -295,6 +308,8 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
         <div class="pt-sub">workouts completed</div>
       </div>
     </div>
+
+
 
     <!-- RUNNING ZONES -->
     <div class="zones-card">
@@ -333,18 +348,8 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
       </div>
     </div>
 
-    <!-- CALENDAR -->
-    <div class="cal-section">
-      <div class="cal-header">
-        <span class="cal-title" id="calLabel">Week</span>
-        <div style="display:flex;gap:6px">
-          <button class="cal-nav" onclick="calNav(-1)">‹</button>
-          <button class="cal-nav" onclick="calNav(1)">›</button>
-        </div>
-      </div>
-      <div class="cal-row" id="calRow"></div>
-    </div>
 
+    <div style="height:20px"></div>
     <div style="height:20px"></div>
   </div>
 </div>
