@@ -53,13 +53,13 @@
   --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
   --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
 }
-html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--font);overflow:hidden}
-.screen{position:absolute;inset:0;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg)}
+html,body{height:100%;min-height:100dvh;background:var(--bg);color:var(--t1);font-family:var(--font);overflow:hidden}
+.screen{position:fixed;inset:0;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg)}
 .screen.active{display:block}
 .safe-pad{padding-top:calc(var(--safe-top) + 16px);padding-bottom:calc(var(--safe-bot) + 90px)}
 
 /* HOME */
-#screen-home{padding:0 16px}
+#screen-home{padding:0}
 #screen-home .safe-pad{padding-bottom:calc(var(--safe-bot) + 32px)}
 .home-greeting{font-size:13px;font-weight:500;color:var(--t3);margin-bottom:6px;letter-spacing:.3px}
 .home-title{font-size:32px;font-weight:800;letter-spacing:-1px;margin-bottom:20px;line-height:1.1}
