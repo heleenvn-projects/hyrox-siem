@@ -16,13 +16,13 @@
   var ctx=c.getContext('2d');
   ctx.fillStyle='#0B0B0D';ctx.beginPath();ctx.roundRect(0,0,180,180,40);ctx.fill();
   var g1=ctx.createRadialGradient(36,36,0,36,36,108);
-  g1.addColorStop(0,'rgba(245,185,66,0.22)');g1.addColorStop(1,'rgba(245,185,66,0)');
+  g1.addColorStop(0,'rgba(230,242,76,0.18)');g1.addColorStop(1,'rgba(230,242,76,0)');
   ctx.fillStyle=g1;ctx.beginPath();ctx.roundRect(0,0,180,180,40);ctx.fill();
-  ctx.strokeStyle='rgba(245,185,66,0.12)';ctx.lineWidth=1.5;
+  ctx.strokeStyle='rgba(230,242,76,0.1)';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.roundRect(2,2,176,176,38);ctx.stroke();
   ctx.font='900 116px Inter,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillText('S',92,94);
-  ctx.fillStyle='#F5B942';ctx.fillText('S',90,92);
+  ctx.fillStyle='#E6F24C';ctx.fillText('S',90,92);
   var g3=ctx.createLinearGradient(0,20,0,90);
   g3.addColorStop(0,'rgba(255,255,255,0.15)');g3.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=g3;ctx.fillText('S',90,92);
@@ -351,9 +351,9 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
     <div class="screen-back" onclick="goTab('home')">‹ Home</div>
     <div class="screen-title">Training Plan</div>
     <div class="seg-control">
-      <button class="seg-btn active" id="seg-fase1" onclick="switchPhase('fase1',this)">Phase 1</button>
-      <button class="seg-btn" id="seg-fase2" onclick="switchPhase('fase2',this)">Phase 2</button>
-      <button class="seg-btn" id="seg-fase3" onclick="switchPhase('fase3',this)">Phase 3</button>
+      <button class="seg-btn active" id="seg-fase1" onclick="switchPhase('fase1',this)">Fase 1</button>
+      <button class="seg-btn" id="seg-fase2" onclick="switchPhase('fase2',this)">Fase 2</button>
+      <button class="seg-btn" id="seg-fase3" onclick="switchPhase('fase3',this)">Fase 3</button>
     </div>
     <div id="plan-fase1" class="phase-panel active">
       <div class="phase-desc">Months 1–4: <strong>Aerobic Base & Structural Integrity.</strong> Hit all gym reps and stay at Easy pace on runs. Aim for body recomposition. Goal: build your engine and protect joints.</div>
@@ -392,15 +392,15 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
       <div class="food-title">Nutrition</div>
     </div>
     <div class="food-tabs">
-      <button class="food-tab active" onclick="switchFood('breakfast',this)">Breakfast</button>
+      <button class="food-tab active" onclick="switchFood('ontbijt',this)">Ontbijt</button>
       <button class="food-tab" onclick="switchFood('snacks',this)">Snacks</button>
       <button class="food-tab" onclick="switchFood('lunch',this)">Lunch</button>
-      <button class="food-tab" onclick="switchFood('dinner',this)">Dinner</button>
+      <button class="food-tab" onclick="switchFood('avond',this)">Avondeten</button>
     </div>
-    <div id="food-breakfast" class="food-panel active"></div>
+    <div id="food-ontbijt" class="food-panel active"></div>
     <div id="food-snacks" class="food-panel"></div>
     <div id="food-lunch" class="food-panel"></div>
-    <div id="food-dinner" class="food-panel"></div>
+    <div id="food-avond" class="food-panel"></div>
     <div style="background:var(--card);border-radius:var(--r);padding:14px;margin-top:8px">
       <div style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:6px">SUPPLEMENTS</div>
       <div style="font-size:13px;color:var(--t2);line-height:1.6">Creatine 5g daily. Protein shake post-workout if needed to hit daily protein targets. Vitamin D3 in winter months.</div>
@@ -730,7 +730,7 @@ for(let w=1;w<=43;w++){
 }
 
 const FOOD = {
-  breakfast:[
+  ontbijt:[
     {name:'Oats & Protein',desc:'80g rolled oats cooked with 350ml milk. Top with 1 banana, 30g whey protein stirred in, 15g peanut butter, and a handful of blueberries.',kcal:620,p:42,c:78,f:16,note:'Pre-training: eat 60–90 min before gym sessions.'},
     {name:'Greek Yogurt Bowl',desc:'250g full-fat Greek yogurt, 40g granola, 1 tbsp honey, 30g mixed berries, 20g almonds.',kcal:480,p:28,c:52,f:18,note:'Great on rest or run days.'},
     {name:'Eggs & Whole Grain Toast',desc:'3 scrambled eggs cooked in 5g butter, 2 slices whole grain toast, 1 avocado (half), salt and pepper.',kcal:520,p:30,c:38,f:26,note:'High satiety — good before long workouts.'},
@@ -745,7 +745,7 @@ const FOOD = {
     {name:'Tuna Pasta Salad',desc:'150g wholemeal pasta cooked, 1 can tuna (150g drained), cherry tomatoes, cucumber, red onion, 2 tbsp light mayo, lemon juice.',kcal:520,p:40,c:62,f:10,note:'Easy to prep in bulk. Good for 2 days.'},
     {name:'Salmon & Sweet Potato',desc:'200g salmon fillet baked with lemon and herbs, 200g sweet potato mashed with a little butter, side salad.',kcal:610,p:48,c:46,f:18,note:'Omega-3s support joint recovery — especially important at 103kg.'},
   ],
-  dinner:[
+  avond:[
     {name:'Beef & Vegetables',desc:'200g lean beef mince, cooked with onion, garlic, bell peppers, tinned tomatoes, herbs. Serve with 200g cooked pasta or rice.',kcal:680,p:55,c:58,f:18,note:'High-protein evening meal for overnight muscle repair.'},
     {name:'Chicken Stir Fry',desc:'200g chicken breast sliced, stir fried with broccoli, snap peas, carrots, soy sauce, ginger, garlic. Serve with 150g cooked noodles.',kcal:560,p:50,c:52,f:12,note:'Light but filling. Easy recovery meal.'},
     {name:'Protein Pancakes (Rest Day)',desc:'3 eggs, 1 scoop protein powder, 50g oats, 100ml milk — blend and cook as pancakes. Top with berries and honey.',kcal:440,p:44,c:42,f:10,note:'Perfect Saturday rest day dinner. Keeps protein up without heavy digestion.'},
@@ -850,7 +850,7 @@ function renderFaseCards(gs){
     const fd=gs.byF[f];
     const pct=fd.t?Math.round(fd.d/fd.t*100):0;
     const cls=isActive?'fc-active-card':'fc-inactive-card';
-    const statusTxt=isActive?'Active':'Upcoming';
+    const statusTxt=isActive?'Actief':'Volgt';
     html+=`<div class="fc ${cls}" onclick="openFaseDetail('${f}')">
       <div class="fc-status">${statusTxt}</div>
       <div class="fc-name" style="color:${m.col}">${m.name}</div>
@@ -892,8 +892,8 @@ function openFaseDetail(fase){
 
 // ─── CALENDAR ────────────────────────────────────────────────────────
 let calWeek=null;
-const DAY_ABBR={'Tuesday':'Tue','Wednesday':'Wed','Thursday':'Thu','Friday':'Fri','Sunday':'Sun'};
-const TYPE_ABBR={k:'GYM',r:'RUN',c:'COND',x:'REST'};
+const DAY_ABBR={'Tuesday':'Di','Wednesday':'Wo','Thursday':'Do','Friday':'Vr','Sunday':'Zo'};
+const TYPE_ABBR={k:'KR',r:'RN',c:'CO',x:'RS'};
 
 function renderCal(){
   if(!calWeek){
@@ -987,8 +987,8 @@ function updateSheetFooter(w,di){
   const footer=document.getElementById('sheetFooter');
   footer.innerHTML=`<div class="sf-bar-bg"><div class="sf-bar" style="width:${pct}%"></div></div>
     <div class="sf-btns">
-      <button class="sf-mark${allDone?' all-done':''}" onclick="${allDone?'uncheckDay()':'markAllSheet()'}">${allDone?'↩ Uncheck day':'✓ Mark all'}</button>
-      <button class="sf-next" onclick="goNextWorkout()" ${nxt?'':'disabled'}>Next ›</button>
+      <button class="sf-mark${allDone?' all-done':''}" onclick="${allDone?'uncheckDay()':'markAllSheet()'}">${allDone?'↩ Dag ontvinken':'✓ Alles afvinken'}</button>
+      <button class="sf-next" onclick="goNextWorkout()" ${nxt?'':'disabled'}>Volgende ›</button>
     </div>`;
 }
 
@@ -1068,8 +1068,6 @@ function closeSheet(){
   document.getElementById('overlay').classList.remove('show');
   sh.setAttribute('aria-hidden','true');
   sheetW=null;sheetDi=null;
-  renderCal();
-  updateHome();
 }
 
 // ─── PLAN SCREEN ─────────────────────────────────────────────────────
@@ -1099,7 +1097,7 @@ function refreshWeekRow(w){
   const s=weekStats(wd);
   const f=wd.f;
   const ringClr=f==='fase1'?'#E6F24C':f==='fase2'?'#4C7DF2':'#F5B942';
-  const sub=document.getElementById('wrsub_'+w);if(sub)sub.textContent=s.done+' / '+s.total+' exercises';
+  const sub=document.getElementById('wrsub_'+w);if(sub)sub.textContent=s.done+' / '+s.total+' workouts';
   const ring=document.getElementById('wrring_'+w);if(ring)ring.innerHTML=ringHTML(s.pct,ringClr);
 }
 
@@ -1122,7 +1120,7 @@ function switchPhase(fase,btn){
 
 // ─── FOOD ─────────────────────────────────────────────────────────────
 function renderFood(){
-  const cats={breakfast:FOOD.breakfast,snacks:FOOD.snacks,lunch:FOOD.lunch,dinner:FOOD.dinner};
+  const cats={ontbijt:FOOD.ontbijt,snacks:FOOD.snacks,lunch:FOOD.lunch,avond:FOOD.avond};
   Object.entries(cats).forEach(([cat,items])=>{
     const el=document.getElementById('food-'+cat);if(!el)return;
     el.innerHTML=items.map((item,i)=>`
