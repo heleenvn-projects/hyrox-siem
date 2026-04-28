@@ -276,6 +276,22 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
     <!-- PHASE CARDS -->
     <div id="faseCards" class="fase-scroll"></div>
 
+    <!-- PROGRESS -->
+    <div class="progress-card" onclick="goTab('plan')">
+      <div class="progress-ring">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="27" fill="none" stroke="#2A2A2E" stroke-width="5"/>
+          <circle cx="32" cy="32" r="27" fill="none" stroke="#E6F24C" stroke-width="5" stroke-linecap="round" id="progressArc" stroke-dasharray="169.6" stroke-dashoffset="169.6"/>
+        </svg>
+        <div class="pr-num" id="progressPct">0%</div>
+      </div>
+      <div class="progress-text">
+        <div class="pt-label">Total Progress</div>
+        <div class="pt-stat" id="progressStat">0 / 0</div>
+        <div class="pt-sub">workouts completed</div>
+      </div>
+    </div>
+
     <!-- RUNNING ZONES -->
     <div class="zones-card">
       <div class="zones-title">Running Zones (Jack Daniels VDOT)</div>
@@ -323,22 +339,6 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
         </div>
       </div>
       <div class="cal-row" id="calRow"></div>
-    </div>
-
-    <!-- PROGRESS -->
-    <div class="progress-card" onclick="goTab('plan')">
-      <div class="progress-ring">
-        <svg width="64" height="64" viewBox="0 0 64 64">
-          <circle cx="32" cy="32" r="27" fill="none" stroke="#2A2A2E" stroke-width="5"/>
-          <circle cx="32" cy="32" r="27" fill="none" stroke="#E6F24C" stroke-width="5" stroke-linecap="round" id="progressArc" stroke-dasharray="169.6" stroke-dashoffset="169.6"/>
-        </svg>
-        <div class="pr-num" id="progressPct">0%</div>
-      </div>
-      <div class="progress-text">
-        <div class="pt-label">Total Progress</div>
-        <div class="pt-stat" id="progressStat">0 / 0</div>
-        <div class="pt-sub">workouts completed</div>
-      </div>
     </div>
 
     <div style="height:20px"></div>
@@ -760,8 +760,11 @@ function ck(w,di,ei){return`c_${w}_${di}_${ei}`}
 function wk(w,di,ei){return`wt_${w}_${di}_${ei}`}
 
 function weekStats(wd){
-  let total=0,done=0;
-  wd.days.forEach((d,di)=>d.ex.forEach((e,ei)=>{total++;if(STATE[ck(wd.w,di,ei)])done++;}));
+  let total=wd.days.length,done=0;
+  wd.days.forEach((d,di)=>{
+    const allDone=d.ex.length>0&&d.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
+    if(allDone)done++;
+  });
   return{total,done,pct:total?Math.round(done/total*100):0};
 }
 
@@ -882,7 +885,7 @@ function openFaseDetail(fase){
       <div class="wr-badge ${m.barCls}">${wd.w}</div>
       <div class="wr-info">
         <div class="wr-title">Week ${wd.w}${wd.d?'<span class="wr-deload">Deload</span>':''}</div>
-        <div class="wr-sub">${s.done} / ${s.total} exercises</div>
+        <div class="wr-sub">${s.done} / ${s.total} workouts</div>
       </div>
       <div class="wr-ring">${ring}</div>
     </div>`;
