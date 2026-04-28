@@ -122,6 +122,10 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fon
 .cd-done .cd-dot{display:none}
 .cd-next{background:var(--card)}
 .cd-next .cd-abbr{color:var(--t2)}
+.cd-next.type-k .cd-type{background:var(--orange-bg);color:var(--orange)}
+.cd-next.type-r .cd-type{background:var(--blue-bg);color:var(--blue)}
+.cd-next.type-c .cd-type{background:var(--green-bg);color:var(--green)}
+.cd-next.type-x .cd-type{background:rgba(124,124,130,.1);color:var(--t3)}
 
 /* PROGRESS */
 .progress-card{background:var(--card);border-radius:var(--r-lg);padding:16px;display:flex;align-items:center;gap:16px;margin-bottom:20px}
@@ -912,7 +916,7 @@ function renderCal(){
   row.innerHTML=wd.days.map((d,di)=>{
     const allDone=d.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
     const isNext=(nxt&&nxt.wd.w===wd.w&&nxt.di===di);
-    let cls='cal-day cd-next';
+    let cls='cal-day cd-next type-'+d.type;
     if(allDone)cls='cal-day cd-done';
     else if(isNext)cls='cal-day cd-active';
     const ti=typeInfo(d.type);
