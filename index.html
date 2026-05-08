@@ -799,20 +799,12 @@ function getTodayDi(wd){
 }
 
 function findNext(){
-  const todayJS=new Date().getDay(); // 0=Sun,1=Mon...
+  const todayJS=new Date().getDay();
   const todayName=JS_DAY_TO_NAME[todayJS]||null;
+  const dayOrder=['Tuesday','Wednesday','Thursday','Friday','Sunday'];
+  const todayIdx=dayOrder.indexOf(todayName);
 
-  // 1. Check if today has a training day in any week
-  //    We don't know which calendar week = which plan week,
-  //    so use the calWeek if set, else week 1 as reference.
-  //    Key rule: show TODAY's workout if it exists and is not done,
-  //    OR the next incomplete workout after today.
-
-  // Find the first incomplete workout, but prefer today's day if not done
-  // Strategy: scan all PLAN entries in order; if today has a training day
-  // that is not yet done, return it. Otherwise return first incomplete after.
-
-  // First pass: is there an incomplete workout TODAY (by day name) in any week?
+  // Pass 1: find today's training day if incomplete
   if(todayName){
     for(const wd of PLAN){
       const di=wd.days.findIndex(d=>d.day===todayName);
@@ -823,23 +815,25 @@ function findNext(){
     }
   }
 
-  // Second pass: no incomplete today-day found (rest day or today done)
-  // Return next incomplete workout after today's weekday position
-  // Order: scan PLAN in order, skip days that come before today's weekday
-  // in the same week if we haven't passed today yet
-  const dayOrder=['Tuesday','Wednesday','Thursday','Friday','Sunday'];
-  const todayIdx=dayOrder.indexOf(todayName); // -1 if rest/unknown
-
+  // Pass 2: today done or rest day — find next workout AFTER today in week order
+  // Never skip a day just because its name matches today across weeks
   for(const wd of PLAN){
     for(let di=0;di<wd.days.length;di++){
       const day=wd.days[di];
       const allDone=day.ex.length>0&&day.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
       if(allDone) continue;
-      // Skip days that are today (already checked above) or before today
-      // within the *same* notional week position — but only for week 1 of scan
-      // Actually: just return the first incomplete that isn't today's day
-      if(day.day===todayName) continue; // already handled above
+      const dayIdx=dayOrder.indexOf(day.day);
+      if(todayIdx>=0&&dayIdx>=0&&dayIdx<=todayIdx) continue;
       return{wd,di,dayData:day};
+    }
+  }
+
+  // Pass 3: wrap around — return first incomplete anywhere
+  for(const wd of PLAN){
+    for(let di=0;di<wd.days.length;di++){
+      const day=wd.days[di];
+      const allDone=day.ex.length>0&&day.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
+      if(!allDone) return{wd,di,dayData:day};
     }
   }
   return null;
