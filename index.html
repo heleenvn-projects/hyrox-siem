@@ -261,7 +261,7 @@ html,body{height:100%;min-height:100dvh;background:var(--bg);color:var(--t1);fon
     <div class="big-cards">
       <div class="bc bc-next" id="nextCard" onclick="openNextFromCard()">
         <div>
-          <div class="bc-ey">NEXT WORKOUT</div>
+          <div class="bc-ey" id="nextCardEyebrow">VOLGENDE WORKOUT</div>
           <div class="bc-ttl" id="nextCardTitle">—</div>
           <div class="bc-meta" id="nextCardMeta">—</div>
         </div>
@@ -788,12 +788,58 @@ function globalStats(){
   return{t,d,pct:t?Math.round(d/t*100):0,byF};
 }
 
+// Maps JS getDay() (0=Sun,1=Mon,...) to training day names
+const JS_DAY_TO_NAME={0:'Sunday',2:'Tuesday',3:'Wednesday',4:'Thursday',5:'Friday'};
+
+function getTodayDi(wd){
+  // Returns di of today's training day in this week, or -1 if rest day
+  const todayName=JS_DAY_TO_NAME[new Date().getDay()]||null;
+  if(!todayName) return -1;
+  return wd.days.findIndex(d=>d.day===todayName);
+}
+
 function findNext(){
+  const todayJS=new Date().getDay(); // 0=Sun,1=Mon...
+  const todayName=JS_DAY_TO_NAME[todayJS]||null;
+
+  // 1. Check if today has a training day in any week
+  //    We don't know which calendar week = which plan week,
+  //    so use the calWeek if set, else week 1 as reference.
+  //    Key rule: show TODAY's workout if it exists and is not done,
+  //    OR the next incomplete workout after today.
+
+  // Find the first incomplete workout, but prefer today's day if not done
+  // Strategy: scan all PLAN entries in order; if today has a training day
+  // that is not yet done, return it. Otherwise return first incomplete after.
+
+  // First pass: is there an incomplete workout TODAY (by day name) in any week?
+  if(todayName){
+    for(const wd of PLAN){
+      const di=wd.days.findIndex(d=>d.day===todayName);
+      if(di===-1) continue;
+      const day=wd.days[di];
+      const allDone=day.ex.length>0&&day.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
+      if(!allDone) return{wd,di,dayData:day};
+    }
+  }
+
+  // Second pass: no incomplete today-day found (rest day or today done)
+  // Return next incomplete workout after today's weekday position
+  // Order: scan PLAN in order, skip days that come before today's weekday
+  // in the same week if we haven't passed today yet
+  const dayOrder=['Tuesday','Wednesday','Thursday','Friday','Sunday'];
+  const todayIdx=dayOrder.indexOf(todayName); // -1 if rest/unknown
+
   for(const wd of PLAN){
     for(let di=0;di<wd.days.length;di++){
       const day=wd.days[di];
-      const allDone=day.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
-      if(!allDone) return{wd,di,dayData:day};
+      const allDone=day.ex.length>0&&day.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
+      if(allDone) continue;
+      // Skip days that are today (already checked above) or before today
+      // within the *same* notional week position — but only for week 1 of scan
+      // Actually: just return the first incomplete that isn't today's day
+      if(day.day===todayName) continue; // already handled above
+      return{wd,di,dayData:day};
     }
   }
   return null;
@@ -830,15 +876,36 @@ function updateHome(){
 }
 
 function updateNextCard(){
-  const nxt=findNext();
+  const todayJS=new Date().getDay();
+  const todayName=JS_DAY_TO_NAME[todayJS]||null;
+
+  // Check if today has a training day that is not yet done
+  let todayWorkout=null;
+  if(todayName){
+    for(const wd of PLAN){
+      const di=wd.days.findIndex(d=>d.day===todayName);
+      if(di===-1) continue;
+      const day=wd.days[di];
+      const allDone=day.ex.length>0&&day.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
+      if(!allDone){todayWorkout={wd,di,dayData:day};break;}
+    }
+  }
+
+  const nxt=todayWorkout||findNext();
   const title=document.getElementById('nextCardTitle');
   const meta=document.getElementById('nextCardMeta');
+  const eyebrow=document.getElementById('nextCardEyebrow');
+
   if(!nxt){
-    if(title)title.textContent='All Done! 🏆';
+    if(eyebrow)eyebrow.textContent='KLAAR';
+    if(title)title.textContent='Alles gedaan 🏆';
     if(meta)meta.textContent='Hyrox ready';
     return;
   }
+
   const ti=typeInfo(nxt.dayData.type);
+  const isToday=todayWorkout&&nxt===todayWorkout;
+  if(eyebrow)eyebrow.textContent=isToday?'VANDAAG':'VOLGENDE WORKOUT';
   if(title){
     title.innerHTML=nxt.dayData.day+'<span class="bc-type-pill" style="background:rgba(0,0,0,.2);color:var(--tinv)">'+ti.lbl+'</span>';
   }
@@ -846,8 +913,20 @@ function updateNextCard(){
 }
 
 function openNextFromCard(){
-  const nxt=findNext();
-  if(nxt) openSheet(nxt.wd.w,nxt.di);
+  const todayJS=new Date().getDay();
+  const todayName=JS_DAY_TO_NAME[todayJS]||null;
+  let target=null;
+  if(todayName){
+    for(const wd of PLAN){
+      const di=wd.days.findIndex(d=>d.day===todayName);
+      if(di===-1) continue;
+      const day=wd.days[di];
+      const allDone=day.ex.length>0&&day.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
+      if(!allDone){target={wd,di};break;}
+    }
+  }
+  if(!target){const nxt=findNext();if(nxt)target={wd:nxt.wd,di:nxt.di};}
+  if(target){calWeek=target.wd.w;renderCal();openSheet(target.wd.w,target.di);}
 }
 
 function renderFaseCards(gs){
@@ -909,21 +988,34 @@ const TYPE_ABBR={k:'KR',r:'RN',c:'CO',x:'RS'};
 
 function renderCal(){
   if(!calWeek){
-    const nxt=findNext();
-    calWeek=nxt?nxt.wd.w:1;
+    const todayJS=new Date().getDay();
+    const todayName=JS_DAY_TO_NAME[todayJS]||null;
+    // Try to find the week containing today's next incomplete workout
+    if(todayName){
+      for(const wd of PLAN){
+        const di=wd.days.findIndex(d=>d.day===todayName);
+        if(di===-1) continue;
+        const allDone=wd.days[di].ex.length>0&&wd.days[di].ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
+        if(!allDone){calWeek=wd.w;break;}
+      }
+    }
+    if(!calWeek){const nxt=findNext();calWeek=nxt?nxt.wd.w:1;}
   }
   const wd=PLAN.find(w=>w.w===calWeek)||PLAN[0];
   const lbl=document.getElementById('calLabel');
   if(lbl)lbl.textContent='Week '+wd.w+' · '+FASE_META_V8[wd.f].name;
-  const nxt=findNext();
+  const todayJS=new Date().getDay();
+  const todayName=JS_DAY_TO_NAME[todayJS]||null;
   const row=document.getElementById('calRow');
   if(!row)return;
   row.innerHTML=wd.days.map((d,di)=>{
-    const allDone=d.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
-    const isNext=(nxt&&nxt.wd.w===wd.w&&nxt.di===di);
+    const allDone=d.ex.length>0&&d.ex.every((_,ei)=>STATE[ck(wd.w,di,ei)]);
+    // Active = today's day that is not done, OR first incomplete if no today
+    const isToday=(d.day===todayName);
+    const isActive=isToday&&!allDone;
     let cls='cal-day cd-next type-'+d.type;
     if(allDone)cls='cal-day cd-done';
-    else if(isNext)cls='cal-day cd-active';
+    else if(isActive)cls='cal-day cd-active';
     const ti=typeInfo(d.type);
     const abbr=DAY_ABBR[d.day]||d.day.substring(0,3);
     const typeStr=TYPE_ABBR[d.type]||'';
